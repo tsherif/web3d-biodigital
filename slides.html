@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>The BioDigital Human</title>
+  <link rel="stylesheet" href="css/reveal.min.css">
+  <link rel="stylesheet" href="css/theme/default.css" id="theme">
+  <link rel="stylesheet" href="plugin/highlight/styles/docco.css">
+  <link rel="icon" type="image/png" href="img/bd-logo.png">
+  <style>
+
+    .reveal h1 {
+      font-size: 3.2em;
+    }
+
+    .reveal .slide-number {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .reveal section img {
+      max-height: 400px;
+    }
+
+    .reveal pre {
+      margin-left: -12%;
+      box-shadow: none;
+      width: 125%;
+    }
+
+    .reveal .sub-header {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 0.15em;
+    }
+
+    .reveal .me {
+      margin-top: 42px;
+    }
+
+    .reveal ul ul {
+      font-size: 0.8em;
+    }
+
+    #logo {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      height: 4%;
+    }
+
+    iframe {
+      width: 1000px;
+      height: 600px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h1>Designing the BioDigital Human API</h1>
+        <p class="me">Tarek Sherif</p>
+        <p>BioDigital</p>
+      </section>
+
+      <section>
+        <h3>What BioDigital Does</h3>
+        <iframe id="humanwidget" src="https://human.biodigital.com/widget/?m=production/maleAdult/heart.json&ui-tools=true&dk=08766920db5a5247ac627bbdc79b283ee52ba619"></iframe>
+      </section>
+
+      <section>
+        <h3>BioDigital's Goals</h3>
+        <ul>
+          <li>Use interactive 3D to make anatomical content engaging</li>
+          <li>
+            Move beyond the anatomy atlas
+            <ul>
+              <li>Tell stories</li>
+              <li>Bring content to life</li>
+              <li>Map data to and from 3D models</li>
+            </ul>
+          </li>
+          <li>Make it all widely accessible through the Web</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>The BioDigital Human Platform</h3>
+        <ul>
+          <li>
+            3D content library
+            <ul>
+              <li>12,000 anatomy objects</li>
+              <li>1,000 health conditions</li>
+            </ul>
+          </li>
+          <li>
+            Rendering engine built on SceneJS
+          </li>
+          <li>User-created annotations and custom views</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Key Clients</h3>
+        <ul>
+          <li>Medical device manufacturers</li>
+          <li>Pharmaceutical</li>
+          <li>Educational</li>
+          <li>Medical students</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>The BioDigital Human API</h3>
+        <ul>
+          <li>
+            Enable outside developers to build applications on top of the BioDigital Human Platform
+            <ul>
+              <li>Load BioDigital renderer and 3D content into an iframe</li>
+              <li>Manipulate the 3D scene via a JavaScript API</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Example Integration</h3>
+        <ul>
+          <li>
+            <a target="_blank" href="http://conditions.about.com/cc/type2diabetes/overview/signs-symptoms/signs_intro">
+              About.com diabetes site integration
+              </a>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Human API Structure</h3>
+        <ul>
+          <li>Wrapper around window messaging protocol</li>
+          <li>RPC functions and events communicate with renderer in iframe</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Key Challenges</h3>
+        <ul>
+          <li>Want to expose as much of the power of the platform as possible</li>
+          <li>Platform code wasn't designed to be public</li>
+          <li>Target audience probably not 3D-savvy</li>
+          <li>Target audience definitely won't know our internal platform jargon</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Guiding Principle</h3>
+        <ul>
+          <li>
+            API design is about empathy
+            <ul>
+              <li>Understand that your users don't know what you know about your platform</li>
+              <li>Understand that your users might have different backgrounds and expertise than you</li>
+              <li>Understand what your users want to do</li>
+              <li>Empower them to do those things</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Old versus new</h3>
+        <ul>
+          <li>Currently preparing a 2.0 API release which involves a significant change in structure</li>
+          <li>
+            Key priorities:
+            <ul>
+              <li>Easily push new features to our users</li>
+              <li>Simplify the interface</li>
+              <li>Consistent naming</li>
+              <li>Avoid unnecessary platform jargon</li>
+              <li>Avoid unnecessary technical jargon</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Maintenance</h3>
+        <ul>
+          <li>The 1.0 API attempted to mimic the API of our rendering engine</li>
+          <li>Underlying messaging API is quite simple</li>
+          <li>Much more complex nested module structure of our engine was built on top of it</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Key consequences</h3>
+        <ul>
+          <li>Changes to the engine had to be mirrored in the API</li>
+          <li>Any new features we wanted to expose to our users required them to update their API code</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 1.0</h3>
+        <pre>
+          <code class="javascript">
+            // Set camera, animate transition
+            human.camera.flyTo(...);
+
+            // Set camera, without animation
+            human.camera.jumpTo(...);
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Question</h3>
+        <ul>
+          <li>
+            What if we want to expose a new function?
+            <ul>
+              <li>Update engine to allow functionality</li>
+              <li>Update API with new method</li>
+              <li>Users must update their API code to use new method</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Maintenance</h3>
+        <ul>
+          <li>2.0 API is a thin layer over the window messaging protocol</li>
+          <li>Pass function name and parameters, all get interpreted in the engine</li>
+          <li>Updates only need to occur in the engine to be made available to all API users</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 2.0</h3>
+        <pre>
+          <code class="javascript">
+            // Set camera
+            human.call("camera.set", ...);
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Mental Models</h3>
+        <ul>
+          <li>Beware of imposing your mental models on your users!</li>
+          <li>The model you used to build your system may not be ideal for those who want to use it</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Simplicity</h3>
+        <ul>
+          <li>Hierarchical structure of the 1.0 API meant users had to dig through modules to find functions</li>
+          <li>Conceptual tie to the engine lead to unintuitive naming conventions</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 1.0</h3>
+        <pre>
+          <code class="javascript">
+            human.pick.pick(
+              50, 78,
+              function(hit) {
+                // Do something
+              });
+
+            human.pick.query(
+              50, 78,
+              function(hit) {
+                // Do something
+              });
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Questions</h3>
+        <ul>
+          <li>What's the difference between these two functions?</li>
+          <li>Does that difference merit separate functions?</li>
+          <li>Do we really need a "pick" module?</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API Surface Area</h3>
+        <ul>
+          <li>More functions means more to learn for your users</li>
+          <li>Hierarchies mean more digging to find what they're looking for</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 2.0</h3>
+        <pre>
+          <code class="javascript">
+            human.call("scene.pick",
+              { x: 50, y: 78 },
+              function(hit) {
+                // Do something
+              });
+
+            human.call("scene.pick",
+              { x: 50, y: 78, triggerActions: true },
+              function(hit) {
+                // Do something
+              });
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Simplicity</h3>
+        <ul>
+          <li>Make sure the things your users want most often are easy to find</li>
+          <li>Collapse similar functions</li>
+          <li>
+            Avoid unintuitive results to actions
+            <ul>
+              <li>E.g. API 1.0 "pick" would highlight or remove an object</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Consistent Naming</h3>
+        <ul>
+          <li>Similar actions on different parts of the system should have similar names</li>
+          <li>Makes it easy to guess how to do things</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 1.0</h3>
+        <pre>
+          <code class="javascript">
+            // Query scene
+            human.scene.getObjects(...);
+
+            // Query camera
+            human.camera.query(...);
+
+            // Query annotations
+            human.annotations.getAnnotations(...);
+
+            // Query timeline
+            human.timeline.query(...);
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Consistency</h3>
+        <ul>
+          <li>
+            All of these methods essentially do the same thing
+            <ul>
+              <li>Get information about some part of the scene</li>
+            </ul>
+          </li>
+          <li>Inconsistent names mean more trips to the API docs</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 2.0</h3>
+        <pre>
+          <code class="javascript">
+            // Query scene
+            human.call("scene.info", ...);
+
+            // Query camera
+            human.call("camera.info", ...);
+
+            // Query annotations
+            human.call("annotations.info", ...);
+
+            // Query timeline
+            human.call("timeline.info", ...);
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Consistency</h3>
+        <ul>
+          <li>Once you learn one part of the API, you get the others for (almost) free</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Platform Jargon</h3>
+        <ul>
+          <li>API 1.0</li>
+        </ul>
+        <pre>
+          <code class="javascript">
+            // Get module information
+            human.modules.getModules(...);
+
+            // Capture a bookmark
+            human.bookmarks.capture(...);
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h2>WAT?</h2>
+      </section>
+
+      <section>
+        <h3>Platform Jargon</h3>
+        <ul>
+          <li>These terms were chosen by BioDigital developers before we created a public API</li>
+          <li>
+            Definitions
+            <ul>
+              <li>Module: Essentially a scene created by BioDigital artists</li>
+              <li>Bookmark: Captured state of a scene after user manipulations</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Platform Jargon</h3>
+        <ul>
+          <li>Users don't care about these distinctions!</li>
+          <li>Just want to load 3D things into a scene</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 2.0</h3>
+        <pre>
+          <code class="javascript">
+            // Load a scene (can be a module or bookmark)
+            human.call("scene.load", ...);
+
+            // Capture current scene state as JSON (bookmark)
+            human.call("scene.capture", ...);
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>One more time</h3>
+        <ul>
+          <li>Don't impose your mental model on your users!</li>
+          <li>API should reflect usage, not implementation</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Technical Jargon</h3>
+        <ul>
+          <li>Our engine developers know 3D graphics</li>
+          <li>Most of our clients do not</li>
+          <li>We have to be wary of 3D idioms making their way into the public API</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 1.0</h3>
+        <pre>
+          <code class="javascript">
+            // Set camera view
+            human.camera.jumpTo({
+              eye: {
+                x: 1,
+                y: 3,
+                z: 2,
+              },
+              look: {
+                x: 0,
+                y: 1,
+                z: 0,
+              }
+            });
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Technical Jargon</h3>
+        <ul>
+          <li>These terms are the standard way to define a camera in 3D graphics</li>
+          <li>
+            To others...
+            <ul>
+              <li>What's the eye of a camera?</li>
+              <li>What's the look?</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>API 2.0</h3>
+        <pre>
+          <code class="javascript">
+            // Set camera view
+            human.call("camera.set", {
+              position: {
+                x: 1,
+                y: 3,
+                z: 2,
+              },
+              target: {
+                x: 0,
+                y: 1,
+                z: 0,
+              }
+            });
+          </code>
+        </pre>
+      </section>
+
+      <section>
+        <h3>Technical Jargon</h3>
+        <ul>
+          <li>Be aware of how your users' background differs from yours</li>
+          <li>Prefer colloquial terms to technical ones</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Summary</h3>
+        <ul>
+          <li>
+            API design is about empathy
+            <ul>
+              <li>Know your users</li>
+              <li>Empower them to build amazing things with your system</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Summary</h3>
+        <ul>
+          <li>Keep the API simple and minimize its surface area</li>
+          <li>
+            Avoid exposing unnecessary platform details to users
+            <ul>
+              <li>Do those details help them do what they want to do?</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Summary</h3>
+        <ul>
+          <li>
+            Default to simplest, most common usage
+            <ul>
+              <li>Avoid surprises</li>
+            </ul>
+          </li>
+          <li>Name things consistently</li>
+          <li>Avoid technical or domain-specific jargon</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Interested in learning more?</h3>
+        <ul>
+          <li>
+            Try out the API!
+            <a target="_blank" href="https://developer.biodigital.com">developer.biodigital.com</a>
+          </li>
+          <li>
+            BioDigital summer internships!
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h1>Thanks!</h1>
+        <ul>
+          <li><a href="mailto:tarek@biodigital.com">tarek@biodigital.com</a></li>
+          <li><a target="_blank" href="https://twitter.com/thsherif">@thsherif</a></li>
+          <li><a target="_blank" href="https://www.biodigital.com">www.biodigital.com</a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <img id="logo" src="img/logo.png">
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.min.js"></script>
+  <script src="js/highlight.min.js"></script>
+  <script src="js/human-api.js"></script>
+  <script>
+    Reveal.initialize({
+      // transition: "none",
+      history: true,
+      slideNumber: true,
+      controls: false
+    });
+
+    hljs.initHighlightingOnLoad();
+  </script>
+</body>
+</html>
